@@ -28,8 +28,8 @@ public class UserController extends BaseApiController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody
   BaseApiModel signUp(@Valid UserRegistrationRequest userRegistrationRequest,
-      BindingResult bindingResult) {
-    return responseData(userService.signUp(userRegistrationRequest, bindingResult));
+      BindingResult bindingResult, HttpServletResponse response) {
+    return responseData(userService.signUp(userRegistrationRequest, bindingResult, response));
   }
 
   @RequestMapping(value = SIGN_IN_URL,

@@ -31,6 +31,9 @@ public class User implements Serializable {
   @Column(name = "role", columnDefinition = "TINYINT(1)", nullable = false)
   private Integer role;
 
+  @Column(name = "ptk", columnDefinition = "NVARCHAR(2048)", nullable = false)
+  private String privateKey;
+
   @Column(name = "created_at", columnDefinition = "DATETIME", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
   @CreatedDate
@@ -87,5 +90,13 @@ public class User implements Serializable {
 
   public void setRole(Integer role) {
     this.role = role;
+  }
+
+  public String getPrivateKey() {
+    return privateKey;
+  }
+
+  public void setPrivateKey(String privateKey) {
+    this.privateKey = privateKey;
   }
 }

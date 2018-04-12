@@ -5,6 +5,7 @@ public enum ResponseCode {
   UNKNOWN("S0001", "Server encountered a problem"),
   MAINTAIN("S0002", "The server is maintenance"),
   CODE_HAS_VALIDATION_ERROR("A0001", "A validation error occurred"),
+  GEN_KEY_RSA_ERROR("A0002", "Gen public and private keys error"),
   ACCOUNT_NOT_FOUND("A0003", "Account not found"),
   LOGIC_ERROR("A0004", "Logic error occurred"),
   INVALID_AUTHENTICATION("A0005", "Illegal Authentication Occurred"),

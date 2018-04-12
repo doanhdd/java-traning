@@ -8,7 +8,8 @@ import org.springframework.validation.BindingResult;
 
 public interface UserService {
 
-  boolean signUp(UserRegistrationRequest request, BindingResult bindingResult);
+  boolean signUp(UserRegistrationRequest request, BindingResult bindingResult,
+      HttpServletResponse response);
 
   UserLoginModel login(UserLoginRequest request, BindingResult bindingResult,
       HttpServletResponse response);
