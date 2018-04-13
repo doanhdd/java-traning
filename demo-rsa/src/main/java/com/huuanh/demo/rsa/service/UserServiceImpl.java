@@ -38,6 +38,9 @@ public class UserServiceImpl implements UserService {
     if (bindingResult.hasErrors()) {
       throw new ValidationException(bindingResult.getFieldErrors());
     }
+    if (userRepository.findByEmail(request.getEmail()) != null) {
+      throw new ApiException(ResponseCode.SAVE_DATA_ERROR.value(), "The email already exists.");
+    }
     String[] privateAndPublicKeys;
     try {
       privateAndPublicKeys = RsaUtils.genPrivateAndPublicKeys();

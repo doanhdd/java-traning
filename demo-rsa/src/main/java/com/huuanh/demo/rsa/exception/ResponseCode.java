@@ -9,8 +9,8 @@ public enum ResponseCode {
   ACCOUNT_NOT_FOUND("A0003", "Account not found"),
   LOGIC_ERROR("A0004", "Logic error occurred"),
   INVALID_AUTHENTICATION("A0005", "Illegal Authentication Occurred"),
-  DATA_NOT_FOUND("A0007", "No data found"),
-  SAVE_DATA_ERROR("A0008", "Error saving data"),
+  DATA_NOT_FOUND("A0006", "No data found"),
+  SAVE_DATA_ERROR("A0007", "Error saving data"),
 
   ERROR_400("400 Bad Request", "Invalid parameter was specified"),
   ERROR_401("401 Unauthorized", "Access to the page failed, please log in again"),
