@@ -5,6 +5,7 @@ import static com.huuanh.demo.rsa.controller.BaseApiController.SIGN_UP_URL;
 
 import com.huuanh.demo.rsa.security.JWTAuthenticationFilter;
 import com.huuanh.demo.rsa.security.JWTAuthorizationFilter;
+import com.huuanh.demo.rsa.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private UserDetailsService userDetailsService;
 
+  @Autowired
+  private UserService userService;
+
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
     return new BCryptPasswordEncoder();
@@ -40,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated()
         .and()
         .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-        .addFilter(new JWTAuthorizationFilter(authenticationManager()));
+        .addFilter(new JWTAuthorizationFilter(authenticationManager(), userService));
   }
 
   @Autowired

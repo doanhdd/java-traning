@@ -1,11 +1,6 @@
 package com.huuanh.demo.rsa.common;
 
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -51,6 +46,20 @@ public class RsaUtils {
     return cipher.doFinal(encrypted);
   }
 
+  public static byte[] encrypt(PublicKey publicKey, String message) throws Exception {
+    Cipher cipher = Cipher.getInstance("RSA");
+    cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+    return cipher.doFinal(message.getBytes());
+  }
+
+  public static byte[] decrypt(PrivateKey privateKey, byte[] encrypted) throws Exception {
+    Cipher cipher = Cipher.getInstance("RSA");
+    cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+    return cipher.doFinal(encrypted);
+  }
+
   public static PrivateKey getPrivateKey(String privateKey) throws Exception {
     PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
     KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -61,6 +70,10 @@ public class RsaUtils {
     X509EncodedKeySpec ks = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
     KeyFactory kf = KeyFactory.getInstance("RSA");
     return kf.generatePublic(ks);
+  }
+
+  public static byte[] decode(String dataEncrypt) {
+    return Base64.getDecoder().decode(dataEncrypt);
   }
 
 }

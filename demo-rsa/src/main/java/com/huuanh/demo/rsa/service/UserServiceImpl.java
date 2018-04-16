@@ -78,4 +78,13 @@ public class UserServiceImpl implements UserService {
 
     return new UserLoginModel(user.getUserId(), user.getEmail());
   }
+
+  @Override
+  public User findByEmail(String email) {
+    User user = userRepository.findByEmail(email);
+    if (null == user) {
+      throw new ApiException(ResponseCode.INVALID_AUTHENTICATION.value(), "User not found!");
+    }
+    return user;
+  }
 }
