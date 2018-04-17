@@ -32,7 +32,7 @@ public class User implements Serializable {
   private Integer role;
 
   @Column(name = "ptk", columnDefinition = "NVARCHAR(2048)", nullable = false)
-  private String privateKey;
+  private String publicKey;
 
   @Column(name = "created_at", columnDefinition = "DATETIME", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -92,11 +92,11 @@ public class User implements Serializable {
     this.role = role;
   }
 
-  public String getPrivateKey() {
-    return privateKey;
+  public String getPublicKey() {
+    return publicKey;
   }
 
-  public void setPrivateKey(String privateKey) {
-    this.privateKey = privateKey;
+  public void setPublicKey(String publicKey) {
+    this.publicKey = publicKey;
   }
 }

@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
     }
     String orderIdEncrypt;
     try {
-      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(user.getPrivateKey());
+      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(Constants.PRIVATE_KEY_SERVER);
       Gson gson = new Gson();
       String data = RsaAlgorithm.decrypt(request.getDataEncrypt(), privateKey);
       //Start Test
@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         orderDetailRepository.save(orderDetail);
       }
       orderIdEncrypt = RsaAlgorithm.encrypt(String.valueOf(orderSaved.getOrderId()),
-              RsaAlgorithm.getPublicKey(Constants.PUBLIC_KEY_SERVER));
+              RsaAlgorithm.getPublicKey(user.getPublicKey()));
     } catch (Exception e) {
       if (e instanceof ApiException) {
         throw (ApiException) e;
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
     }
     try {
       String plainText = RsaAlgorithm.verifyOrder(request.getDataEncrypt());
-      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(user.getPrivateKey());
+      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(Constants.PRIVATE_KEY_SERVER);
       String data = RsaAlgorithm.decrypt(plainText, privateKey);
       Integer orderId = Integer.valueOf(data);
       Order order = orderRepository.findOrderByOrderId(orderId);
