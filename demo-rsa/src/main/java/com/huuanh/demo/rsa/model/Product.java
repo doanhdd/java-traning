@@ -2,17 +2,10 @@ package com.huuanh.demo.rsa.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -62,14 +55,18 @@ public class Product implements Serializable {
   @LastModifiedDate
   private Date modifiedAt;
 
-  @OneToOne(mappedBy = "product", targetEntity = OrderDetail.class, fetch = FetchType.LAZY)
-  private Set<OrderDetail> orderDetails;
+  @OneToMany(mappedBy = "product", targetEntity = OrderDetail.class, fetch = FetchType.LAZY)
+  private List<OrderDetail> orderDetails;
 
-  public Set<OrderDetail> getOrderDetails() {
+  @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, fetch = FetchType.LAZY)
+  @OrderBy(value = "seq_no asc")
+  private List<ProductImage> productImages;
+
+  public List<OrderDetail> getOrderDetails() {
     return orderDetails;
   }
 
-  public void setOrderDetails(Set<OrderDetail> orderDetails) {
+  public void setOrderDetails(List<OrderDetail> orderDetails) {
     this.orderDetails = orderDetails;
   }
 
@@ -167,5 +164,13 @@ public class Product implements Serializable {
 
   public void setModifiedAt(Date modifiedAt) {
     this.modifiedAt = modifiedAt;
+  }
+
+  public List<ProductImage> getProductImages() {
+    return productImages;
+  }
+
+  public void setProductImages(List<ProductImage> productImages) {
+    this.productImages = productImages;
   }
 }

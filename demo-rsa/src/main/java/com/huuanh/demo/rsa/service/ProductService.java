@@ -1,9 +1,11 @@
 package com.huuanh.demo.rsa.service;
 
-import com.huuanh.demo.rsa.model.Product;
+import com.huuanh.demo.rsa.viewmodel.ProductViewModel;
+
+import java.util.List;
 
 public interface ProductService {
 
-  Iterable<Product> getProducts();
+    List<ProductViewModel> getProducts();
 
 }

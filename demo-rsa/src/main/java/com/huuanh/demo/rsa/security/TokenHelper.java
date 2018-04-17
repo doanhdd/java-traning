@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public class TokenHelper {
 
-  public static void addAuthentication(HttpServletResponse response, String terminalUuid) {
+  public static String addAuthentication(HttpServletResponse response, String email) {
     String jwt = Jwts.builder()
-        .setSubject(terminalUuid)
+        .setSubject(email)
         .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET)
         .compact();
 
     response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + " " + jwt);
+    return jwt;
   }
 
   public static String getToken(HttpServletRequest request) {

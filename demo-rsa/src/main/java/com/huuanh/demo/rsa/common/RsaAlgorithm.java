@@ -1,16 +1,22 @@
 package com.huuanh.demo.rsa.common;
 
+import com.huuanh.demo.rsa.exception.ApiException;
+import org.springframework.util.StringUtils;
+
 import javax.crypto.Cipher;
 import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+import static com.huuanh.demo.rsa.common.Constants.SIGNATURE_TEXT;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class RsaAlgorithm {
     public static final int KEY_SIZE = 2048;
 
     public static String[] genPrivateAndPublicKeys() throws Exception {
-        KeyPair keyPair = buildKeyPair(RsaUtils.KEY_SIZE);
+        KeyPair keyPair = buildKeyPair(KEY_SIZE);
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey pubKey = keyPair.getPublic();
         return new String[]{getPrivateKeyString(privateKey),
@@ -34,9 +40,9 @@ public class RsaAlgorithm {
 
     public static String decrypt(String cipherText, PrivateKey privateKey) throws Exception {
         byte[] bytes = Base64.getDecoder().decode(cipherText);
-        Cipher decriptCipher = Cipher.getInstance("RSA/None/OAEPWithSHA1AndMGF1Padding", "BC");
-        decriptCipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return new String(decriptCipher.doFinal(bytes), UTF_8);
+        Cipher decryptCipher = Cipher.getInstance("RSA/None/OAEPWithSHA1AndMGF1Padding", "BC");
+        decryptCipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return new String(decryptCipher.doFinal(bytes), UTF_8);
     }
 
     public static String signature(String plainText, PrivateKey privateKey) throws Exception {
@@ -59,11 +65,41 @@ public class RsaAlgorithm {
         return publicSignature.verify(signatureBytes);
     }
 
-    public static String getPublicKeyString(PublicKey publicKey) {
+    public static PrivateKey getPrivateKey(String privateKey) throws Exception {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
+        KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+        return kf.generatePrivate(ks);
+    }
+
+    public static PublicKey getPublicKey(String publicKey) throws Exception {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+
+        Provider[] p = Security.getProviders();
+        X509EncodedKeySpec ks = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
+        KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
+        return kf.generatePublic(ks);
+    }
+
+    private static String getPublicKeyString(PublicKey publicKey) {
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 
-    public static String getPrivateKeyString(PrivateKey privateKey) {
+    private static String getPrivateKeyString(PrivateKey privateKey) {
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+    }
+
+    public static String signatureOrder(String plainText) {
+        if (StringUtils.isEmpty(plainText)) {
+            throw new ApiException("Can't signature");
+        }
+        return Constants.SIGNATURE_TEXT + plainText;
+    }
+
+    public static String verifyOrder(String plainText) {
+        if(!StringUtils.isEmpty(plainText) && plainText.indexOf(SIGNATURE_TEXT, 0) == 0) {
+            return plainText.substring(plainText.indexOf(SIGNATURE_TEXT, 0) + SIGNATURE_TEXT.length());
+        }
+        throw new ApiException("Can't verify");
     }
 }

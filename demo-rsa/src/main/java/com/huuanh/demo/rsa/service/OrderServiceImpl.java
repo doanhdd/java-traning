@@ -1,10 +1,8 @@
 package com.huuanh.demo.rsa.service;
 
-import static com.huuanh.demo.rsa.common.Constants.ORDER_STATUS_CONFIRMED;
-import static com.huuanh.demo.rsa.common.Constants.ORDER_STATUS_NEW;
-
 import com.google.gson.Gson;
-import com.huuanh.demo.rsa.common.RsaUtils;
+import com.huuanh.demo.rsa.common.Constants;
+import com.huuanh.demo.rsa.common.RsaAlgorithm;
 import com.huuanh.demo.rsa.exception.ApiException;
 import com.huuanh.demo.rsa.exception.ResponseCode;
 import com.huuanh.demo.rsa.exception.ValidationException;
@@ -18,15 +16,18 @@ import com.huuanh.demo.rsa.repository.ProductRepository;
 import com.huuanh.demo.rsa.viewmodel.OrderCreateListModel;
 import com.huuanh.demo.rsa.viewmodel.OrderCreateModel;
 import com.huuanh.demo.rsa.viewmodel.OrderRequest;
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+
+import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.huuanh.demo.rsa.common.Constants.ORDER_STATUS_CONFIRMED;
+import static com.huuanh.demo.rsa.common.Constants.ORDER_STATUS_NEW;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -48,11 +49,11 @@ public class OrderServiceImpl implements OrderService {
     }
     String orderIdEncrypt;
     try {
-      PrivateKey privateKey = RsaUtils.getPrivateKey(user.getPrivateKey());
+      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(user.getPrivateKey());
       Gson gson = new Gson();
-      String data = new String(RsaUtils.decrypt(privateKey, RsaUtils.decode(request.getDataEncrypt())));
+      String data = RsaAlgorithm.decrypt(request.getDataEncrypt(), privateKey);
       //Start Test
-      //  String data = "[{\"id\":1,\"quantity\":5}]";
+      //  String data = "{\"products\":[{\"id\":1,\"quantity\":5}]}"
       // End test
       OrderCreateListModel orderCreateListModel = gson.fromJson(data, OrderCreateListModel.class);
       List<OrderDetail> orderDetailList = validateOrderDetail(orderCreateListModel);
@@ -66,13 +67,16 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setOrderId(orderSaved.getOrderId());
         orderDetailRepository.save(orderDetail);
       }
-      orderIdEncrypt = new String(
-          RsaUtils.encrypt(privateKey, String.valueOf(orderSaved.getOrderId())));
+      orderIdEncrypt = RsaAlgorithm.encrypt(String.valueOf(orderSaved.getOrderId()),
+              RsaAlgorithm.getPublicKey(Constants.PUBLIC_KEY_SERVER));
     } catch (Exception e) {
+      if (e instanceof ApiException) {
+        throw (ApiException) e;
+      }
       throw new ApiException(ResponseCode.GEN_KEY_RSA_ERROR);
     }
 
-    return orderIdEncrypt;
+    return RsaAlgorithm.signatureOrder(orderIdEncrypt);
   }
 
   @Override
@@ -82,11 +86,9 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException(bindingResult.getFieldErrors());
     }
     try {
-      PrivateKey privateKey = RsaUtils.getPrivateKey(user.getPrivateKey());
-      //Start Test
-//      String data = "1";
-      // End test
-      String data = new String(RsaUtils.decrypt(privateKey, RsaUtils.decode(request.getDataEncrypt())));
+      String plainText = RsaAlgorithm.verifyOrder(request.getDataEncrypt());
+      PrivateKey privateKey = RsaAlgorithm.getPrivateKey(user.getPrivateKey());
+      String data = RsaAlgorithm.decrypt(plainText, privateKey);
       Integer orderId = Integer.valueOf(data);
       Order order = orderRepository.findOrderByOrderId(orderId);
       if (null == order) {

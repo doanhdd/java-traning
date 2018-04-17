@@ -16,7 +16,7 @@ public class ProductController extends BaseApiController {
 
   @RequestMapping(value = PRODUCT_LIST, method = RequestMethod.GET)
   public @ResponseBody
-  BaseApiModel signUp() {
+  BaseApiModel getProducts() {
     return responseData(productService.getProducts());
   }
 
