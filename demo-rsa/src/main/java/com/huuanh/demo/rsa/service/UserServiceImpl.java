@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
     user.setRole(SecurityConstants.ROLE_USER);
     user.setCreatedAt(new Date());
-    user.setPublicKey(privateAndPublicKeys[0]);
+    user.setPublicKey(privateAndPublicKeys[1]);
     userRepository.save(user);
 
     String token = TokenHelper.addAuthentication(response, user.getEmail());
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
       e.printStackTrace();
       throw new ApiException(ResponseCode.GEN_KEY_RSA_ERROR);
     }
-    user.setPublicKey(privateAndPublicKeys[0]);
+    user.setPublicKey(privateAndPublicKeys[1]);
     userRepository.save(user);
 
     String token = TokenHelper.addAuthentication(response, user.getEmail());

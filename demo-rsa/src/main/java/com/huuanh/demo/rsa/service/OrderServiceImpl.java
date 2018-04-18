@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setOrderId(orderSaved.getOrderId());
         orderDetailRepository.save(orderDetail);
       }
-      orderIdEncrypt = RsaAlgorithm.encrypt(String.valueOf(orderSaved.getOrderId()),
+      orderIdEncrypt = RsaAlgorithm.encrypt(RsaAlgorithm.signatureOrder(String.valueOf(orderSaved.getOrderId())),
               RsaAlgorithm.getPublicKey(user.getPublicKey()));
     } catch (Exception e) {
       if (e instanceof ApiException) {
@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
       throw new ApiException(ResponseCode.GEN_KEY_RSA_ERROR);
     }
 
-    return RsaAlgorithm.signatureOrder(orderIdEncrypt);
+    return orderIdEncrypt;
   }
 
   @Override
@@ -86,9 +86,9 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException(bindingResult.getFieldErrors());
     }
     try {
-      String plainText = RsaAlgorithm.verifyOrder(request.getDataEncrypt());
       PrivateKey privateKey = RsaAlgorithm.getPrivateKey(Constants.PRIVATE_KEY_SERVER);
-      String data = RsaAlgorithm.decrypt(plainText, privateKey);
+      String plainText = RsaAlgorithm.decrypt(request.getDataEncrypt(), privateKey);
+      String data = RsaAlgorithm.verifyOrder(plainText);
       Integer orderId = Integer.valueOf(data);
       Order order = orderRepository.findOrderByOrderId(orderId);
       if (null == order) {
